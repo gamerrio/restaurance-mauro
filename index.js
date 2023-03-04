@@ -1,23 +1,39 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
+
+app.use(express.static(__dirname+"/assets/bootstrap/css"));
+app.use(express.static(__dirname+"/assets/bootstrap/js"));
+app.use(express.static(__dirname +"/assets/css"));
+app.use(express.static(__dirname +"/assets/img"));
+app.use(express.static(__dirname +"/assets/js"));
+
 app.use(bodyParser.urlencoded({extended: true}));
-var database = require('../mysql');
+
+mongoose.connect('mongodb://localhost:27017/hackathon',{useNewUrlParser: true});
+
+
+var login =new mongoose.Schema({
+    name:String,
+    pass:String,
+    person:String,
+});
+
+const loginup =new mongoose.model('document', login);  // main hai ye dbs ka 
 
 app.post('/signup.html',(req,res)=>{
     var temp =loginup({
         name: req.body.mail,
         pass: req.body.pass,
-        person: req.body.namo,
-        number: req.body.number,
+        person: req.body.name,
     });
     const name = req.body.mail;
      const pass = req.body.pass;
-      const person = req.body.namo;
+      const person = req.body.name;
       const rep = req.body.repeat;
-      const num1 = req.body.number;
-    if(name=="" || pass=="" || person=="" || num1==""){
+    if(name=="" || pass=="" || person=="" || rep==""){
         res.send("please fill this information");
     }
 
@@ -49,16 +65,16 @@ app.post('/signup.html',(req,res)=>{
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: 'restaurance.mauro@gmail.com',
-        pass: ''
+        user: 'ra0001j@gmail.com',
+        pass: 'lztneumdqnfhiwaf'
     } 
 });
     const name2 = req.body.mail;
     var mailOptions = {
-      from: 'restaurance.mauro@gmail.com',
+      from: 'ra0001j@gmail.com',
       to: name2,
       subject: 'thanks for registration',
-      text: 'Welcome to website your otp is ' + tempotp
+      text: 'Welcome to  website your otp is ' + tempotp
     };
 
 
@@ -72,95 +88,30 @@ const transporter = nodemailer.createTransport({
       });
 
 //end
-    res.sendfile('sucessSign.html');})
+    res.send("sucess");})
 
-// app.post('/login.html',async (req,res)=>{
-//   const nam =  req.body.maill;
-//   const pas = req.body.passs;
-//  const username =  await loginup.findOne({name:nam});
-//  const t = username.pass;
-//  const k = username.person;
-//  const l = username.name;
-//  const number1 = username.number;
-//  console.log(k);
-// if(t===pas){
-//     let names = k;
-//     res.render('profile',{
-//       userName: names,
-//       usermail: l,
-//       number: number1
-//     });
-// }
-// else{
-//     res.send("password or username wrong plz check them");
-// }
+app.post('/login.html',async (req,res)=>{
+  const nam =  req.body.email;
+  const pas = req.body.passs;
+ const username =  await loginup.findOne({name:nam});
+ const t = username.pass;
+ const k = username.person;
+ const l = username.name;
+ console.log(k);
+if(t===pas){
+    // let names = k;
+    // res.render('profile',{
+    //   userName: names,
+    //   usermail: l,
+    //   number: number1
+    // });
+    res.send('sucess');
+}
+else{
+    res.send("password or username wrong plz check them");
+}
 
-// })
-
-
-var router = express.Router();
-
-/* GET home page. */
-// router.get('/', function(req, res, next) {
-//   res.render('index', { title: 'Express', session : req.session });
-// });
-
-// router.post('/login', function(request, response, next){
-
-//     var user_email_address = request.body.user_email_address;
-
-//     var user_password = request.body.user_password;
-
-//     if(user_email_address && user_password)
-//     {
-//         query = `
-//         SELECT * FROM user_login 
-//         WHERE user_email = "${user_email_address}"
-//         `;
-
-//         database.query(query, function(error, data){
-
-//             if(data.length > 0)
-//             {
-//                 for(var count = 0; count < data.length; count++)
-//                 {
-//                     if(data[count].user_password == user_password)
-//                     {
-//                         request.session.user_id = data[count].user_id;
-
-//                         response.redirect("/");
-//                     }
-//                     else
-//                     {
-//                         response.send('Incorrect Password');
-//                     }
-//                 }
-//             }
-//             else
-//             {
-//                 response.send('Incorrect Email Address');
-//             }
-//             response.end();
-//         });
-//     }
-//     else
-//     {
-//         response.send('Please Enter Email Address and Password Details');
-//         response.end();
-//     }
-
-// });
-
-// router.get('/logout', function(request, response, next){
-
-//     request.session.destroy();
-
-//     response.redirect("/");
-
-// });
-
-// module.exports = router;
-
+})
 
 
 
@@ -172,8 +123,8 @@ app.get('/signup.html',(req,res)=>{
     res.sendfile('signup.html');
 })
 
-app.listen(PORT,(req,res)=>{
-    console.log(`server start ${PORT} `);
+app.listen(port,(req,res)=>{
+    console.log(`server start  ${port}`);
 })
 
 
